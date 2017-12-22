@@ -2,8 +2,8 @@
 //  ViewController.h
 //  LPMTimerDemo
 //
-//  Created by 金龙潘 on 2017/12/22.
-//  Copyright © 2017年 金龙潘. All rights reserved.
+//  Created by Jaylon on 2017/12/22.
+//  Copyright © 2017年 Jaylon. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
