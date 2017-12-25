@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "LPMTimer.h"
+#import "TestItem.h"
 
 @interface ViewController ()
 @property (weak, nonatomic) IBOutlet UILabel *label;
@@ -38,11 +39,22 @@
         NSLog(@"%@",[NSThread currentThread]);
         NSLog(@"timer: %zd",i++);
     };
-//    dispatch_async(dispatch_get_global_queue(0, 0), ^{
     
-//        [LPMTimer firedTimerWithInterval:1 repeat:NO block:block];
-//    });
-    self.timer = [LPMTimer timerWithInterval:3 repeat:YES block:block];
+//    NSArray *intervalList = @[@(1),@(2),@(3),@(4)];
+//    [LPMTimer firedTimerScheduleRightNowWithIntervalList:intervalList keyPath:nil block:block];
+    
+    
+    NSArray *intervalList = @[[TestItem itemWithInterval:1],
+                              [TestItem itemWithInterval:2],
+                              [TestItem itemWithInterval:3],
+                              [TestItem itemWithInterval:4]];
+    
+     [LPMTimer firedTimerScheduleRightNowWithIntervalList:intervalList keyPath:@"interval" block:block];
+    //    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    
+    //        [LPMTimer firedTimerWithInterval:1 repeat:NO block:block];
+    //    });
+//     [LPMTimer firedTimerWithInterval:1 repeat:NO block:block];
     
     
 }

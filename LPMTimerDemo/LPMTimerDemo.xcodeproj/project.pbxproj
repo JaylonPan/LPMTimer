@@ -14,6 +14,7 @@
 		1BD081131FECD80100578086 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1BD081111FECD80100578086 /* LaunchScreen.storyboard */; };
 		1BD081161FECD80100578086 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BD081151FECD80100578086 /* main.m */; };
 		1BD0811E1FECDB8100578086 /* LPMTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BD0811D1FECDB8100578086 /* LPMTimer.m */; };
+		1BD081211FED1F3B00578086 /* TestItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BD081201FED1F3B00578086 /* TestItem.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,8 @@
 		1BD081151FECD80100578086 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		1BD0811C1FECDB8100578086 /* LPMTimer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LPMTimer.h; path = ../../LPMTimer.h; sourceTree = "<group>"; };
 		1BD0811D1FECDB8100578086 /* LPMTimer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = LPMTimer.m; path = ../../LPMTimer.m; sourceTree = "<group>"; };
+		1BD0811F1FED1F3B00578086 /* TestItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestItem.h; sourceTree = "<group>"; };
+		1BD081201FED1F3B00578086 /* TestItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestItem.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +70,8 @@
 				1BD081071FECD80100578086 /* AppDelegate.m */,
 				1BD081091FECD80100578086 /* ViewController.h */,
 				1BD0810A1FECD80100578086 /* ViewController.m */,
+				1BD0811F1FED1F3B00578086 /* TestItem.h */,
+				1BD081201FED1F3B00578086 /* TestItem.m */,
 				1BD0810C1FECD80100578086 /* Main.storyboard */,
 				1BD0810F1FECD80100578086 /* Assets.xcassets */,
 				1BD081111FECD80100578086 /* LaunchScreen.storyboard */,
@@ -149,6 +154,7 @@
 			files = (
 				1BD0810B1FECD80100578086 /* ViewController.m in Sources */,
 				1BD081161FECD80100578086 /* main.m in Sources */,
+				1BD081211FED1F3B00578086 /* TestItem.m in Sources */,
 				1BD081081FECD80100578086 /* AppDelegate.m in Sources */,
 				1BD0811E1FECDB8100578086 /* LPMTimer.m in Sources */,
 			);

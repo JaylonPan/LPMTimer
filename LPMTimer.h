@@ -40,14 +40,23 @@ typedef NS_ENUM(NSUInteger, LPMTimerStatus) {
 - (instancetype)initWithInterval:(NSTimeInterval )interval
                               repeat:(BOOL)repeat
                                block:(LPMTimerBlock )block;
+
+- (instancetype)initWithIntervalList:(NSArray *)intervalList
+                             keyPath:(NSString *)keyPath
+                               block:(LPMTimerBlock )block;
 + (instancetype)timerWithInterval:(NSTimeInterval )interval
                                repeat:(BOOL )repeat
+                                block:(LPMTimerBlock )block;
++ (instancetype)timerWithIntervalList:(NSArray *)intervalList
+                              keyPath:(NSString *)keyPath
                                 block:(LPMTimerBlock )block;
 //This method will call the block right now.
 + (instancetype)timerScheduleRightNowWithTimeInterval:(NSTimeInterval)interval
                                                repeat:(BOOL)repeat
                                                 block:(LPMTimerBlock)block;
-
++ (instancetype)timerScheduleRightNowWithTimeIntervalList:(NSArray *)intervalList
+                                                  keyPath:(NSString *)keyPath
+                                                    block:(LPMTimerBlock )block;
 /**********************                         END                          **********************/
 
 
@@ -59,9 +68,15 @@ typedef NS_ENUM(NSUInteger, LPMTimerStatus) {
 + (instancetype)firedTimerWithInterval:(NSTimeInterval )interval
                                     repeat:(BOOL )repeat
                                      block:(LPMTimerBlock )block;
++ (instancetype)firedTimerWithIntervalList:(NSArray *)intervalList
+                                   keyPath:(NSString *)keyPath
+                                     block:(LPMTimerBlock )block;
 //This method will call the block right now.
 + (instancetype)firedTimerScheduleRightNowWithTimeInterval:(NSTimeInterval )interval
                                                     repeat:(BOOL )repeat
+                                                     block:(LPMTimerBlock )block;
++ (instancetype)firedTimerScheduleRightNowWithIntervalList:(NSArray *)intervalList
+                                                   keyPath:(NSString *)keyPath
                                                      block:(LPMTimerBlock )block;
 /**********************                         END                          **********************/
 

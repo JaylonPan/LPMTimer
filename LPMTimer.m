@@ -16,10 +16,14 @@
 @property (nonatomic, copy) LPMTimerBlock block;
 @property (nonatomic, assign, getter=isRepeat) BOOL repeat;
 @property (nonatomic, assign) NSTimeInterval timeInterval;
+@property (nonatomic, copy) NSArray *IntervalList;
+@property (nonatomic, copy) NSString *keyPath;
+@property (nonatomic, assign) NSUInteger currentIntervalIndex;
 @property (nonatomic, assign) BOOL scheduleRightNow;
 @property (nonatomic, strong) NSDate *lastScheduleDate;
 @property (nonatomic, assign) NSTimeInterval timeForResume;
 @property (assign ) LPMTimerStatus status;
+@property (nonatomic, assign) BOOL isFirstSchedule;
 @end
 @implementation LPMTimer
 - (void)dealloc {
@@ -30,20 +34,44 @@
     CFRelease(_timerRef);
     _timerRef = nil;
     _timerRunloop = nil;
-//    NSLog(@"LPMTimer deallocated!");
+    NSLog(@"LPMTimer deallocated!");
 }
-- (instancetype)initWithInterval:(NSTimeInterval)interval repeat:(BOOL)repeat rightNow:(BOOL)rightNow block:(LPMTimerBlock)block {
-    if (self = [super init]) {
+- (instancetype)initWithInterval:(NSTimeInterval)interval
+                          repeat:(BOOL)repeat
+                    intervalList:(NSArray *)intervalList
+                         keyPath:(NSString *)keyPath
+                        rightNow:(BOOL)rightNow
+                           block:(LPMTimerBlock)block {
+    if (self = [self init]) {
         self.timeInterval = interval;
+        self.IntervalList = intervalList;
+        self.keyPath = keyPath;
         self.scheduleRightNow = rightNow;
         self.repeat = repeat;
         self.block = block;
-        CFAbsoluteTime time = CFDateGetAbsoluteTime((CFDateRef)[NSDate dateWithTimeIntervalSinceNow:rightNow ?0:interval]);
-        _timerRef = CFRunLoopTimerCreateWithHandler(kCFAllocatorDefault, time, interval, 0, 0, ^(CFRunLoopTimerRef timer) {
+        self.isFirstSchedule = YES;
+        [self getTimeInteval];
+        CFAbsoluteTime time = CFDateGetAbsoluteTime((CFDateRef)[NSDate dateWithTimeIntervalSinceNow:rightNow ?0:self.timeInterval]);
+        _timerRef = CFRunLoopTimerCreateWithHandler(kCFAllocatorDefault, time, self.timeInterval, 0, 0, ^(CFRunLoopTimerRef timer) {
             self.lastScheduleDate = [NSDate date];
             self.block(self);
             if (!repeat) {
                 [self invalidate];
+            }
+            if (self.IntervalList.count ) {
+                if (!self.scheduleRightNow || !self.isFirstSchedule) {
+                    self.currentIntervalIndex ++;
+                }
+                if (self.IntervalList.count > self.currentIntervalIndex) {
+                    [self getTimeInteval];
+                    CFAbsoluteTime theTime = CFDateGetAbsoluteTime((CFDateRef)[NSDate dateWithTimeIntervalSinceNow:self.timeInterval]);
+                    CFRunLoopTimerSetNextFireDate(timer, theTime);
+                }else{
+                    [self invalidate];
+                }
+            }
+            if (self.isFirstSchedule) {
+                self.isFirstSchedule = NO;
             }
         });
         self.status = LPMTimerPreparedToFire;
@@ -51,9 +79,37 @@
     return self;
 }
 
+- (instancetype)initWithInterval:(NSTimeInterval)interval repeat:(BOOL)repeat rightNow:(BOOL)rightNow block:(LPMTimerBlock)block {
+    return [self initWithInterval:interval
+                           repeat:repeat
+                     intervalList:nil
+                          keyPath:nil
+                         rightNow:rightNow
+                            block:block];
+}
+
 - (instancetype)initWithInterval:(NSTimeInterval)interval repeat:(BOOL)repeat block:(LPMTimerBlock)block {
     return [self initWithInterval:interval repeat:repeat rightNow:NO block:block];
 }
+
+- (instancetype)initWithIntervalList:(NSArray *)intervalList
+                             kayPath:(NSString *)keyPath
+                            rightNow:(BOOL )rightNow
+                               block:(LPMTimerBlock )block {
+    return [self initWithInterval:0
+                           repeat:YES
+                     intervalList:intervalList
+                          keyPath:keyPath
+                         rightNow:rightNow
+                            block:block];
+}
+
+- (instancetype)initWithIntervalList:(NSArray *)intervalList
+                             keyPath:(NSString *)keyPath
+                               block:(LPMTimerBlock )block {
+    return [self initWithIntervalList:intervalList kayPath:keyPath rightNow:NO block:block];
+}
+
 
 + (instancetype)timerWithInterval:(NSTimeInterval)interval repeat:(BOOL)repeat block:(LPMTimerBlock)block {
     return [self timerWithInterval:interval repeat:repeat rightNow:NO block:block];
@@ -65,6 +121,17 @@
 
 + (instancetype)timerWithInterval:(NSTimeInterval)interval repeat:(BOOL)repeat rightNow:(BOOL)rightNow  block:(LPMTimerBlock)block {
     return [[LPMTimer alloc]initWithInterval:interval repeat:repeat rightNow:rightNow block:block];
+}
+
++ (instancetype)timerWithIntervalList:(NSArray *)intervalList keyPath:(NSString *)keyPath rightNow:(BOOL)rightNow block:(LPMTimerBlock )block {
+    LPMTimer *timer = [[LPMTimer alloc]initWithIntervalList:intervalList kayPath:keyPath rightNow:rightNow block:block];
+    return timer;
+}
++ (instancetype)timerWithIntervalList:(NSArray *)intervalList keyPath:(NSString *)keyPath block:(LPMTimerBlock )block {
+    return [self timerWithIntervalList:intervalList keyPath:keyPath rightNow:NO block:block];
+}
++ (instancetype)timerScheduleRightNowWithTimeIntervalList:(NSArray *)intervalList keyPath:(NSString *)keyPath block:(LPMTimerBlock )block {
+    return [self timerWithIntervalList:intervalList keyPath:keyPath rightNow:YES block:block];
 }
 
 + (instancetype)firedTimerWithInterval:(NSTimeInterval)interval
@@ -82,6 +149,19 @@
     return [self firedTimerWithInterval:interval repeat:repeat rightNow:YES block:block];
 }
 
++ (instancetype)firedTimerWithIntervalList:(NSArray *)intervalList keyPath:(NSString *)keyPath rightNow:(BOOL)rightNow block:(LPMTimerBlock )block {
+    LPMTimer *timer = [self timerWithIntervalList:intervalList keyPath:keyPath rightNow:rightNow block:block];
+    [timer fire];
+    return timer;
+}
+
++ (instancetype)firedTimerWithIntervalList:(NSArray *)intervalList keyPath:(NSString *)keyPath block:(LPMTimerBlock )block {
+    return [self firedTimerWithIntervalList:intervalList keyPath:keyPath rightNow:NO block:block];
+}
+
++ (instancetype)firedTimerScheduleRightNowWithIntervalList:(NSArray *)intervalList keyPath:(NSString *)keyPath block:(LPMTimerBlock )block {
+    return [self firedTimerWithIntervalList:intervalList keyPath:keyPath rightNow:YES block:block];
+}
 
 - (void)fire {
     if (self.status != LPMTimerPreparedToFire) {
@@ -90,7 +170,7 @@
 //        }
         return;
     }
-    if (!self.repeat) {
+    if (!self.repeat || self.IntervalList.count) {
         self.selfForNotRepeatTimer = self;
     }
     if ([NSThread isMainThread]) {
@@ -144,6 +224,32 @@
 
 - (BOOL )isValid {
     return (self.status != LPMTimerInvalidated) ? YES : NO;
+}
+
+- (void)setTolerance:(NSTimeInterval)tolerance {
+    if (!_timerRef) {
+        return;
+    }
+    CFRunLoopTimerSetTolerance(_timerRef, tolerance);
+}
+
+- (NSTimeInterval )tolerance {
+    if (!_timerRef) {
+        return 0;
+    }
+   return CFRunLoopTimerGetTolerance(_timerRef);
+}
+
+- (NSTimeInterval )getTimeInteval {
+    if (self.IntervalList.count) {
+        id item = self.IntervalList[self.currentIntervalIndex];
+        if (self.keyPath.length) {
+            self.timeInterval = [[item valueForKeyPath:self.keyPath] doubleValue];
+        }else{
+            self.timeInterval = [item doubleValue];
+        }
+    }
+    return self.timeInterval;
 }
 
 + (CFRunLoopRef )timerRunloop {
